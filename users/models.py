@@ -6,9 +6,9 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(max_length=40, unique=True, verbose_name='Email')
     phone = models.CharField(max_length=20, verbose_name='Телефон')
-    country = models.CharField(max_length=50, verbose_name='Страна')
+    town = models.CharField(max_length=50, verbose_name='Город', null=True)
     img = models.ImageField(upload_to='users/imgs', null=True, blank=True, verbose_name='Аватар')
-    token = models.CharField(max_length=100, verbose_name='Токен', default='')
+    # token = models.CharField(max_length=100, verbose_name='Токен', default='')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
