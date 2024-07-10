@@ -21,8 +21,14 @@ class User(AbstractUser):
 
 
 class Payment(models.Model):
+    PAYMENT_TYPES = (
+        ('c', 'cash'),
+        ('t', 'transfer'),
+    )
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     payment_date = models.DateField(auto_now_add=True, verbose_name='Дата оплаты')
+    payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPES, default='c', verbose_name='Тип оплаты')
 
     # создадим полиморфную связь
     content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
