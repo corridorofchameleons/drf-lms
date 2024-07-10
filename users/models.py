@@ -26,7 +26,7 @@ class Payment(models.Model):
         ('t', 'transfer'),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments', verbose_name='Пользователь')
     payment_date = models.DateField(auto_now_add=True, verbose_name='Дата оплаты')
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPES, default='c', verbose_name='Тип оплаты')
 
