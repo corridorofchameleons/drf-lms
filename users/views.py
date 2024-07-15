@@ -4,6 +4,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 
 from users.models import User, Payment
+from users.permissions import IsSelf
 from users.serializers import UserSerializer, PaymentSerializer
 
 
@@ -18,9 +19,10 @@ class UserCreateAPIView(CreateAPIView):
         user.save()
 
 
-# class UserRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
+class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = IsSelf,
 
 
 class UserPaymentsAPIView(generics.ListAPIView):
