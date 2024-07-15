@@ -1,11 +1,11 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, filters
 from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from users.models import User, Payment
 from users.permissions import IsSelf
-from users.serializers import UserSerializer, PaymentSerializer
+from users.serializers import UserSerializer, PaymentSerializer, UserMiniSerializer
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -22,7 +22,13 @@ class UserCreateAPIView(CreateAPIView):
 class UserRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = IsSelf,
+    permission_classes = IsSelf, IsAuthenticated
+
+
+class UserListAPIView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserMiniSerializer
+    permission_classes = IsAuthenticated,
 
 
 class UserPaymentsAPIView(generics.ListAPIView):
