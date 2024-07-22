@@ -7,12 +7,14 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 
 from materials.models import Course, Lesson, Subscription
+from materials.pagination import MyPaginator
 from materials.serializers import CourseSerializer, LessonSerializer, CourseLessonsSerializer
 from users.permissions import IsModerator, IsOwner
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
+    pagination_class = MyPaginator
 
     def get_queryset(self):
         user = self.request.user
@@ -60,6 +62,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+    pagination_class = MyPaginator
 
     def get_queryset(self):
         user = self.request.user
