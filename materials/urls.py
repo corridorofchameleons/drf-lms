@@ -19,5 +19,5 @@ urlpatterns = [
     path('lessons/<int:pk>/', LessonRetrieveAPIView.as_view(), name='lesson_details'),
     path('lessons/', LessonListAPIView.as_view(), name='lesson_list'),
 
-    path('subscriptions/', SubscriptionView.as_view())
+    path('subscriptions/', SubscriptionView.as_view(), name='subscribe')
 ]
