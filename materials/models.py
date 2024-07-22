@@ -34,3 +34,8 @@ class Lesson(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
