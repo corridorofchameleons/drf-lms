@@ -2,10 +2,12 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
 from materials.models import Course, Lesson
-from users.serializers import PaymentSerializer
+from materials.validators import validate_link
 
 
 class LessonSerializer(serializers.ModelSerializer):
+    link = serializers.CharField(validators=[validate_link])
+
     class Meta:
         model = Lesson
         fields = '__all__'
