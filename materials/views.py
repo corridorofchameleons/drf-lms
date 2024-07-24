@@ -1,3 +1,5 @@
+from drf_yasg.openapi import Parameter, IN_QUERY
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -90,6 +92,10 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
 
 
 class SubscriptionView(APIView):
+    @swagger_auto_schema(operation_description="Enables or disables subscription",
+                         manual_parameters=[Parameter('course_id', IN_QUERY, type='int')],
+                         responses={200: "Subscription created, Subscription deleted", 404: "No Course matches the "
+                                                                                            "given query."})
     def post(self, *args, **kwargs):
         user = self.request.user
         course_id = self.request.data.get('course')
