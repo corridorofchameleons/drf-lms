@@ -1,14 +1,17 @@
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
+
+
 from rest_framework import generics, filters
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
 from materials.models import Course, Lesson
 from users.models import User, Payment
 from users.permissions import IsSelf
-from users.serializers import UserSerializer, PaymentSerializer, UserMiniSerializer
-from users.services import create_session, create_price
+from users.serializers import UserSerializer, PaymentSerializer, UserMiniSerializer, PaymentPostSerializer
+from users.services import create_session
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -43,23 +46,36 @@ class UserPaymentsAPIView(generics.ListAPIView):
 
 
 class PaymentAPIView(generics.CreateAPIView):
-    serializer_class = PaymentSerializer
+    serializer_class = PaymentPostSerializer
     queryset = Payment.objects.all()
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         user = self.request.user
+        obj_id = serializer.validated_data.get('object_id')
+        cont_type = serializer.validated_data.get('content_type').pk
+
+        if Payment.objects.filter(user=user, object_id=obj_id,
+                                  content_type=cont_type).exists():
+            return Response({"message": 'already exists'})
+
         payment = serializer.save(user=user)
-        obj = payment.content_type.pk
+
         try:
-            if obj == 7:
-                name = Course.objects.get(pk=payment.object_id)
-            elif obj == 8:
-                name = Lesson.objects.get(pk=payment.object_id)
+            if cont_type == 7:
+                name = Course.objects.get(pk=obj_id)
+            elif cont_type == 8:
+                name = Lesson.objects.get(pk=obj_id)
             else:
                 raise Http404('Nothing like that')
         except:
             raise Http404('Nothing like that')
-        # print(obj)
+
         session_id, payment_link = create_session(100000, name)
-        print(session_id, payment_link)
+        payment.session_id = session_id
+        payment.payment_link = payment_link
         payment.save()
+
+        return Response({"payment_link": payment_link})

@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase
 from rest_framework.serializers import ValidationError
-from materials.models import Course, Lesson, Subscription
+from materials.models import Course, Lesson
 from users.models import User
 
 from django.shortcuts import reverse

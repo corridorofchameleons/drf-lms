@@ -29,6 +29,8 @@ class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments', verbose_name='Пользователь')
     payment_date = models.DateField(auto_now_add=True, verbose_name='Дата оплаты')
     payment_type = models.CharField(max_length=1, choices=PAYMENT_TYPES, default='t', verbose_name='Тип оплаты')
+    payment_link = models.CharField(max_length=400, null=True)
+    session_id = models.CharField(max_length=100, null=True)
 
     # создадим полиморфную связь
     content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)

@@ -31,5 +31,3 @@ def create_session(price, name):
         mode="payment",
     )
     return session.id, session.get('url')
-
-

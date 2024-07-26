@@ -9,6 +9,12 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class PaymentPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ['content_type', 'object_id']
+
+
 class UserSerializer(serializers.ModelSerializer):
     payments = PaymentSerializer(many=True, read_only=True)
 
