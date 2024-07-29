@@ -3,7 +3,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -11,6 +11,7 @@ from django.http import Http404
 from materials.models import Course, Lesson, Subscription
 from materials.pagination import MyPaginator
 from materials.serializers import CourseSerializer, LessonSerializer, CourseLessonsSerializer
+from materials.tasks import send_info
 from users.permissions import IsModerator, IsOwner
 
 
@@ -60,6 +61,14 @@ class LessonCreateAPIView(generics.CreateAPIView):
         lesson.owner = self.request.user
         lesson.save()
 
+        emails = []
+        course = lesson.course
+        subscriptions = Subscription.objects.filter(course=course)
+        for s in subscriptions:
+            emails.append(s.user.email)
+
+        send_info.delay(course.name, emails, f'Добавлен урок {lesson.name}')
+
 
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
@@ -84,11 +93,32 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
 
+    def perform_update(self, serializer):
+        lesson = serializer.save()
+
+        emails = []
+        course = lesson.course
+        subscriptions = Subscription.objects.filter(course=course)
+        for s in subscriptions:
+            emails.append(s.user.email)
+
+        send_info.delay(course.name, emails, f'Урок {lesson.name} изменен')
+
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsOwner]
+
+    def perform_destroy(self, lesson):
+        emails = []
+        course = lesson.course
+        subscriptions = Subscription.objects.filter(course=course)
+        for s in subscriptions:
+            emails.append(s.user.email)
+
+        send_info.delay(course.name, emails, f'Урок {lesson.name} удален')
+        lesson.delete()
 
 
 class SubscriptionView(APIView):
