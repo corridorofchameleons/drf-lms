@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -170,6 +172,13 @@ CELERY_BROKER_URL = os.getenv('REDIS_CELERY')
 CELERY_RESULT_BACKEND = os.getenv('REDIS_CELERY')
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+CELERY_BEAT_SCHEDULE = {
+    'daily_task': {
+        'task': 'materials.tasks.deactivate_user',
+        'schedule': timedelta(days=1),
+    },
+}
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
