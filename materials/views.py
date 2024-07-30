@@ -50,6 +50,16 @@ class CourseViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsOwner, IsAuthenticated]
         return [permission() for permission in self.permission_classes]
 
+    def perform_update(self, serializer):
+        course = serializer.save()
+
+        emails = []
+        subscriptions = Subscription.objects.filter(course=course)
+        for s in subscriptions:
+            emails.append(s.user.email)
+
+        send_info.delay(course.name, emails, f'Изменен курс {course}')
+
 
 class LessonCreateAPIView(generics.CreateAPIView):
     queryset = Lesson.objects.all()
