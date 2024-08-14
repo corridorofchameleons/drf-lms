@@ -7,5 +7,3 @@ COPY /requirements.txt /
 RUN pip install -r /requirements.txt --no-cache-dir
 
 COPY . .
-
-CMD ["sh", "-c", "python3 manage.py migrate && python manage.py runserver"]
